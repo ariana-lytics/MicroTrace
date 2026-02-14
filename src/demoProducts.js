@@ -1,0 +1,88 @@
+export const DEMO_PRODUCTS = [
+  {
+    productType: 'Plastic water bottle',
+    material: 'Single-use PET plastic',
+    riskScore: 9,
+    riskLevel: 'High',
+    microplastics: 74000,
+    carbonFootprint: 82,
+    carbonBreakdown: { production: 60, transport: 12, disposal: 10 },
+    healthConcerns: [
+      'Releases particles when heated or agitated',
+      'Chemical leaching (BPA, phthalates)',
+      'Single-use = high waste',
+    ],
+    alternatives: [
+      { name: 'Reusable Steel Bottle', microReduction: 95, carbonReduction: 90, price: '$15-30', lasts: '10+ years' },
+      { name: 'Glass bottle', microReduction: 98, carbonReduction: 85, price: '$10-25', lasts: '5+ years' },
+    ],
+  },
+  {
+    productType: 'Tea bag box',
+    material: 'Plastic-sealed tea bags',
+    riskScore: 8,
+    riskLevel: 'High',
+    microplastics: 15000,
+    carbonFootprint: 45,
+    carbonBreakdown: { production: 30, transport: 8, disposal: 7 },
+    healthConcerns: [
+      'Tea bags release microplastics when steeped in hot water',
+      'Plastic mesh in many tea bags',
+      'Daily use compounds exposure',
+    ],
+    alternatives: [
+      { name: 'Loose leaf tea', microReduction: 95, carbonReduction: 70, price: '$5-15', lasts: 'N/A' },
+      { name: 'Stainless steel tea infuser', microReduction: 98, carbonReduction: 80, price: '$8-20', lasts: '10+ years' },
+    ],
+  },
+  {
+    productType: 'Fleece jacket',
+    material: 'Synthetic polyester fleece',
+    riskScore: 8,
+    riskLevel: 'High',
+    microplastics: 20000,
+    carbonFootprint: 120,
+    carbonBreakdown: { production: 85, transport: 25, disposal: 10 },
+    healthConcerns: [
+      'Sheds microfibers in wash',
+      'Skin contact and inhalation',
+      'Enters waterways',
+    ],
+    alternatives: [
+      { name: 'Organic cotton or wool jacket', microReduction: 90, carbonReduction: 60, price: '$40-100', lasts: '5+ years' },
+      { name: 'Recycled polyester with Guppyfriend wash bag', microReduction: 80, carbonReduction: 40, price: '$15-30', lasts: '2+ years' },
+    ],
+  },
+  {
+    productType: 'Plastic takeout container',
+    material: 'Single-use plastic (PS/PP)',
+    riskScore: 7,
+    riskLevel: 'Medium',
+    microplastics: 15000,
+    carbonFootprint: 55,
+    carbonBreakdown: { production: 38, transport: 10, disposal: 7 },
+    healthConcerns: [
+      'Leaches when in contact with hot food',
+      'Not microwave-safe for reuse',
+      'Single-use waste',
+    ],
+    alternatives: [
+      { name: 'Bring your own container', microReduction: 95, carbonReduction: 90, price: '$5-20', lasts: '2+ years' },
+      { name: 'Glass meal prep containers', microReduction: 98, carbonReduction: 85, price: '$15-40', lasts: '5+ years' },
+    ],
+  },
+  {
+    productType: 'Reusable steel bottle',
+    material: 'Stainless steel',
+    riskScore: 2,
+    riskLevel: 'Low',
+    microplastics: 500,
+    carbonFootprint: 25,
+    carbonBreakdown: { production: 18, transport: 4, disposal: 3 },
+    healthConcerns: [
+      'Minimal microplastic release',
+      'Safe for hot and cold drinks',
+    ],
+    alternatives: [],
+  },
+]

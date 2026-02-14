@@ -1,0 +1,55 @@
+:root {
+  --safe-1: #0d4f4f;
+  --safe-2: #0f6b6b;
+  --safe-3: #128a8a;
+  --safe-4: #2db8b8;
+  --safe-5: #7dd3d3;
+  --safe-bg: #e8f6f6;
+  --warning: #e67e22;
+  --warning-light: #fef5ee;
+  --danger: #c0392b;
+  --danger-light: #fdedec;
+  --surface: #ffffff;
+  --text: #1a2c2c;
+  --text-muted: #5a6c6c;
+  --card-shadow: 0 4px 20px rgba(13, 79, 79, 0.08);
+  --tap-min: 44px;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(180deg, var(--safe-bg) 0%, #d4eeed 50%, #fff 100%);
+  color: var(--text);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Safe area for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
