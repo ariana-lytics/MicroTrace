@@ -1,20 +1,29 @@
 :root {
-  --safe-1: #0d4f4f;
-  --safe-2: #0f6b6b;
-  --safe-3: #128a8a;
-  --safe-4: #2db8b8;
-  --safe-5: #7dd3d3;
-  --safe-bg: #e8f6f6;
-  --warning: #e67e22;
-  --warning-light: #fef5ee;
+  --transition: 300ms;
+  --teal: #14b8a6;
+  --teal-dark: #0d9488;
+  --orange: #f97316;
+  --mint: #d1fae5;
+  --mint-light: #ecfdf5;
+  --dark-teal: #134e4a;
+  --gray: #6b7280;
+  --safe-1: #134e4a;
+  --safe-2: #14b8a6;
+  --safe-3: #0d9488;
+  --safe-4: #2dd4bf;
+  --safe-5: #99f6e4;
+  --safe-bg: #d1fae5;
+  --warning: #f97316;
+  --warning-light: #fff7ed;
   --danger: #c0392b;
   --danger-light: #fdedec;
   --surface: #ffffff;
-  --text: #1a2c2c;
-  --text-muted: #5a6c6c;
-  --card-shadow: 0 4px 20px rgba(13, 79, 79, 0.08);
+  --text: #134e4a;
+  --text-muted: #6b7280;
+  --card-shadow: 0 4px 20px rgba(20, 184, 166, 0.08);
   --tap-min: 44px;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -28,7 +37,7 @@
 html, body, #root {
   min-height: 100vh;
   min-height: 100dvh;
-  background: linear-gradient(180deg, var(--safe-bg) 0%, #d4eeed 50%, #fff 100%);
+  background: linear-gradient(180deg, var(--mint-light) 0%, var(--mint) 50%, #fff 100%);
   color: var(--text);
 }
 

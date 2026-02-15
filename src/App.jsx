@@ -5,6 +5,10 @@ import { lookupWithGemini } from './geminiLookup'
 import { identifyWithGemini } from './identifyProduct'
 import { DEMO_PRODUCTS } from './demoProducts'
 import { calculateScore, getPercentile, getRecommendations } from './quizScoring'
+import { addScanToProfile, getProfile } from './profileStore'
+import MicroTraceProfile from './MicroTraceProfile'
+import { LearnMore } from './LearnMore'
+import { NavBar } from './NavBar'
 import styles from './App.module.css'
 
 const SCREENS = {
@@ -16,6 +20,8 @@ const SCREENS = {
   SCAN_LOADING: 'scan_loading',
   SCAN_RESULT: 'scan_result',
   SCAN_DEMO_PICK: 'scan_demo_pick',
+  PROFILE: 'profile',
+  INFO: 'info',
 }
 
 const QUIZ_QUESTIONS = [
@@ -31,10 +37,11 @@ const QUIZ_QUESTIONS = [
 
 function WelcomeScreen({ onNext }) {
   return (
-    <section className={styles.screen} aria-label="Welcome">
+    <section className={`${styles.screen} ${styles.welcomeScreen}`} aria-label="Welcome">
       <div className={styles.welcomeContent}>
         <h1 className={styles.welcomeHeadline}>Would you eat plastic?</h1>
         <p className={styles.welcomeSubline}>Well you are. And drinking it too.</p>
+        <p className={styles.welcomeSubheadline}>An accessible tool for reducing plastic waste</p>
         <img
           src="/mouth-plastic.png"
           alt="Mouth with plastic waste"
@@ -48,25 +55,38 @@ function WelcomeScreen({ onNext }) {
   )
 }
 
-function ChoiceScreen({ onScan, onAssessment, onBack }) {
+function ChoiceScreen({ onScan, onAssessment, onProfile, onBack }) {
   return (
     <section className={styles.screen} aria-label="MicroTrace">
       <div className={styles.choiceContent}>
-        <h2 className={styles.choiceBrand}>MicroTrace</h2>
         <img
           src="/microtrace-logo.png"
-          alt="MicroTrace logo – reduce plastic waste"
+          alt="MicroTrace logo"
           className={styles.choiceLogo}
         />
-        <p className={styles.choiceTagline}>
-          An accessible beginner&apos;s guide to reducing plastic waste
-        </p>
+        <h2 className={styles.choiceBrand}>MicroTrace</h2>
+        <p className={styles.choiceTagline}>Your Personal Microplastic Tracker</p>
         <div className={styles.choiceButtons}>
           <button className={styles.choiceBtnPrimary} onClick={onScan} type="button">
-            Scan a Product
+            <span className={styles.choiceBtnIcon}>📸</span>
+            <span className={styles.choiceBtnText}>
+              <strong>Scan a Product</strong>
+              <span className={styles.choiceBtnPreview}>Analyze products instantly</span>
+            </span>
           </button>
-          <button className={styles.choiceBtn} onClick={onAssessment} type="button">
-            Take Quick Assessment
+          <button className={styles.choiceBtnSecondary} onClick={onAssessment} type="button">
+            <span className={styles.choiceBtnIcon}>📝</span>
+            <span className={styles.choiceBtnText}>
+              <strong>Take Quick Assessment</strong>
+              <span className={styles.choiceBtnPreview}>5-minute lifestyle quiz</span>
+            </span>
+          </button>
+          <button className={styles.choiceBtnSecondary} onClick={onProfile} type="button">
+            <span className={styles.choiceBtnIcon}>📊</span>
+            <span className={styles.choiceBtnText}>
+              <strong>My Progress</strong>
+              <span className={styles.choiceBtnPreview}>See your impact over time</span>
+            </span>
           </button>
           <button className={styles.choiceBackBtn} onClick={onBack} type="button">
             ← Back to home
@@ -97,8 +117,8 @@ function QuizScreen({ onComplete, onSkip }) {
           <div className={styles.progressBar} style={{ width: `${((current + 1) / 8) * 100}%` }} />
           <p className={styles.progressText}>Question {current + 1} of 8</p>
         </div>
-        <h2 className={styles.quizQuestion}>{q.text}</h2>
-        <div className={styles.quizOptions}>
+        <h2 key={current} className={styles.quizQuestion}>{q.text}</h2>
+        <div key={`opts-${current}`} className={styles.quizOptions}>
           {q.options.map((opt) => (
             <button
               key={opt}
@@ -133,6 +153,7 @@ function AssessmentResultsScreen({ answers, onBack }) {
           <div className={styles.bodyPart} data-area="lungs">Lungs</div>
           <div className={styles.bodyPart} data-area="organs">Organs</div>
         </div>
+        <p className={styles.citationLine}>Found in 77% of human blood<sup className={styles.citationSup}>1</sup></p>
         <p className={styles.percentile}>
           You&apos;re in the top {100 - percentile}% of exposure
         </p>
@@ -148,6 +169,7 @@ function AssessmentResultsScreen({ answers, onBack }) {
             )}
           </ul>
         </div>
+        <LearnMore />
         <button className={styles.secondaryButton} onClick={onBack} type="button">
           Back to home
         </button>
@@ -263,8 +285,8 @@ function ScanLoadingScreen({ onDemoFallback }) {
     <section className={styles.screen} aria-label="Analyzing">
       <div className={styles.loadingContent}>
         <div className={styles.spinner} aria-hidden />
-        <p className={styles.loadingText}>Identifying with Imagga...</p>
-        <p className={styles.loadingHint}>AI image recognition in progress</p>
+        <p className={styles.loadingText}>Analyzing with Gemini AI...</p>
+        <p className={styles.loadingHint}>Identifying plastics and packaging</p>
       </div>
     </section>
   )
@@ -297,7 +319,7 @@ function DemoPickScreen({ onSelect, onBack, error }) {
   )
 }
 
-function ProductResultScreen({ product, onBack }) {
+function ProductResultScreen({ product, onBack, onTrackToProfile, trackSaved }) {
   const [whyOpen, setWhyOpen] = useState(false)
   const p = product || {}
   const score = p.riskScore ?? 0
@@ -332,7 +354,7 @@ function ProductResultScreen({ product, onBack }) {
           <h3>Microplastic exposure</h3>
           <p className={styles.bigNumber}>~{(p.microplastics ?? 0).toLocaleString()} particles per use</p>
           <div className={styles.bodyDiagram}>
-            <span>bloodstream → lungs → organs</span>
+            <span>bloodstream → lungs → organs<sup className={styles.citationSup}>1,2</sup></span>
           </div>
           <span className={styles.badge} data-level={riskColor}>{p.riskLevel || '—'} concern</span>
         </div>
@@ -383,6 +405,22 @@ function ProductResultScreen({ product, onBack }) {
           </div>
         </div>
 
+        {onTrackToProfile && (
+          <>
+            {trackSaved && (
+              <p className={`${styles.trackSavedMsg} ${styles.trackSavedMsgAnim}`}>✅ Saved! Daily exposure updated</p>
+            )}
+            <button
+              className={styles.trackProfileBtn}
+              onClick={() => onTrackToProfile(product)}
+              type="button"
+              disabled={trackSaved}
+            >
+              {trackSaved ? 'Saved!' : 'Add to MicroTrace Profile'}
+            </button>
+          </>
+        )}
+        <LearnMore />
         <button className={styles.secondaryButton} onClick={onBack} type="button">Done</button>
       </div>
     </section>
@@ -394,6 +432,7 @@ export default function App() {
   const [quizAnswers, setQuizAnswers] = useState(null)
   const [scanResult, setScanResult] = useState(null)
   const [scanError, setScanError] = useState(null)
+  const [trackSaved, setTrackSaved] = useState(false)
 
   const goWelcome = () => {
     setScreen(SCREENS.WELCOME)
@@ -415,6 +454,13 @@ export default function App() {
     setScreen(SCREENS.SCAN_RESULT)
   }
   const goDemoPick = () => setScreen(SCREENS.SCAN_DEMO_PICK)
+  const goProfile = () => setScreen(SCREENS.PROFILE)
+
+  const handleTrackToProfile = (product) => {
+    addScanToProfile(product)
+    setTrackSaved(true)
+    setTimeout(() => setTrackSaved(false), 3000)
+  }
 
   const handlePhotoReady = async (blob) => {
     goScanLoading()
@@ -459,57 +505,76 @@ export default function App() {
   if (screen === SCREENS.WELCOME) {
     return <WelcomeScreen onNext={goChoice} />
   }
-  if (screen === SCREENS.CHOICE) {
-    return (
-      <>
-        <ChoiceScreen onScan={goScan} onAssessment={goQuiz} onBack={goWelcome} />
-      </>
-    )
-  }
-  if (screen === SCREENS.QUIZ) {
-    return (
-      <QuizScreen
-        onComplete={goAssessmentResults}
-        onSkip={() => goAssessmentResults({})}
-      />
-    )
-  }
-  if (screen === SCREENS.ASSESSMENT_RESULTS) {
-    return (
-      <AssessmentResultsScreen
-        answers={quizAnswers || {}}
-        onBack={goChoice}
-      />
-    )
-  }
-  if (screen === SCREENS.SCAN) {
-    return (
-      <ScanScreen
-        onPhotoReady={handlePhotoReady}
-        onBack={goChoice}
-      />
-    )
-  }
-  if (screen === SCREENS.SCAN_LOADING) {
-    return <ScanLoadingScreen onDemoFallback={goDemoPick} />
-  }
-  if (screen === SCREENS.SCAN_DEMO_PICK) {
-    return (
-      <DemoPickScreen
-        onSelect={(p) => goScanResult(p)}
-        onBack={goChoice}
-        error={scanError}
-      />
-    )
-  }
-  if (screen === SCREENS.SCAN_RESULT) {
-    return (
-      <ProductResultScreen
-        product={scanResult}
-        onBack={goChoice}
-      />
-    )
+  const goInfo = () => setScreen(SCREENS.INFO)
+  const showNav = [SCREENS.CHOICE, SCREENS.SCAN, SCREENS.QUIZ, SCREENS.ASSESSMENT_RESULTS, SCREENS.PROFILE, SCREENS.INFO].includes(screen)
+  const profile = getProfile()
+  const progressBadge = profile?.badges?.filter((b) => b.unlocked).length ?? 0
+
+  const handleNav = (target) => {
+    if (target === 'choice') goChoice()
+    else if (target === 'scan') goScan()
+    else if (target === 'quiz') goQuiz()
+    else if (target === 'profile') goProfile()
+    else if (target === 'info') goInfo()
   }
 
-  return null
+  const appContent = (
+    <>
+      {screen === SCREENS.WELCOME && <WelcomeScreen onNext={goChoice} />}
+      {screen === SCREENS.CHOICE && (
+        <ChoiceScreen
+          onScan={goScan}
+          onAssessment={goQuiz}
+          onProfile={goProfile}
+          onBack={goWelcome}
+        />
+      )}
+      {screen === SCREENS.QUIZ && (
+        <QuizScreen onComplete={goAssessmentResults} onSkip={() => goAssessmentResults({})} />
+      )}
+      {screen === SCREENS.ASSESSMENT_RESULTS && (
+        <AssessmentResultsScreen answers={quizAnswers || {}} onBack={goChoice} />
+      )}
+      {screen === SCREENS.SCAN && (
+        <ScanScreen onPhotoReady={handlePhotoReady} onBack={goChoice} />
+      )}
+      {screen === SCREENS.SCAN_LOADING && <ScanLoadingScreen onDemoFallback={goDemoPick} />}
+      {screen === SCREENS.SCAN_DEMO_PICK && (
+        <DemoPickScreen onSelect={(p) => goScanResult(p)} onBack={goChoice} error={scanError} />
+      )}
+      {screen === SCREENS.SCAN_RESULT && (
+        <ProductResultScreen
+          product={scanResult}
+          onBack={goChoice}
+          onTrackToProfile={handleTrackToProfile}
+          trackSaved={trackSaved}
+        />
+      )}
+      {screen === SCREENS.PROFILE && <MicroTraceProfile onBack={goChoice} />}
+      {screen === SCREENS.INFO && (
+        <section className={styles.screen} aria-label="Info">
+          <div className={styles.infoContent}>
+            <h2 className={styles.infoTitle}>About MicroTrace</h2>
+            <p className={styles.infoBody}>
+              MicroTrace helps you track microplastic exposure and reduce plastic waste. 
+            </p>
+            <LearnMore />
+          </div>
+        </section>
+      )}
+    </>
+  )
+
+  if (screen === SCREENS.WELCOME) {
+    return <WelcomeScreen onNext={goChoice} />
+  }
+  if (showNav) {
+    return (
+      <div className={styles.appWithNav}>
+        <NavBar currentScreen={screen} onNavigate={handleNav} progressBadge={progressBadge} />
+        <main className={styles.mainContent}>{appContent}</main>
+      </div>
+    )
+  }
+  return appContent
 }
